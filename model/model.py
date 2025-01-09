@@ -5,7 +5,7 @@ from sqlalchemy.ext.declarative import declarative_base
 Base = declarative_base()
 
 class User(Base):
-    __tablename__ = 'login'
+    __tablename__ = 'users'
 
     id = Column(String, primary_key=True, index=True)
     password = Column(String, index=True)
