@@ -7,8 +7,8 @@ Base = declarative_base()
 # User 모델
 class User(Base):
     __tablename__ = 'users'
-
-    id = Column(String, primary_key=True, index=True)  # id는 String 타입으로 설정
+    numder = Column(Integer, primary_key=True, index=True)
+    id= Column(String, unique=True, index=True)
     password = Column(String, index=True)
     name = Column(String, index=True)
 
@@ -19,9 +19,9 @@ class User(Base):
 class Todo(Base):
     __tablename__ = 'todos'
     
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
     task = Column(String, index=True)
-    user_id = Column(String, ForeignKey('users.id'))  # user_id는 외래키로 추가
+    user_id = Column(Integer, ForeignKey('users.numder'))  # user_id는 외래키로 추가
 
     # Todo와 TodoItem 간의 일대다 관계 설정
     items = relationship("TodoItem", back_populates="todo", cascade="all, delete", passive_deletes=True)

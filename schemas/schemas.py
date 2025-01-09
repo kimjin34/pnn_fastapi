@@ -16,9 +16,7 @@ class LoginDTO(BaseModel):
     user_PW: str
 
 class TodoListDTO(BaseModel):
-    id: int
     task: str 
 
-    class Config:
-        orm_mode = True
+   
   

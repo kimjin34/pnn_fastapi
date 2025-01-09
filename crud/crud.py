@@ -36,19 +36,10 @@ def create_access_token(data: Dict[str, str], expires_delta: timedelta = None) -
 
 def verify_token(token: str):
     try:
-        # JWT 토큰 디코딩
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        # 토큰의 만료 시간 체크
-        exp = payload.get("exp")
-        if exp and datetime.fromtimestamp(exp) < datetime.utcnow():
-            raise HTTPException(status_code=401, detail="Token has expired")
-        
         return payload
     except JWTError:
-        raise HTTPException(status_code=403, detail="Could not validate credentials")
-    except Exception as e:
-        # 예외에 대한 구체적인 오류 처리
-        raise HTTPException(status_code=500, detail=f"An unexpected error occurred: {str(e)}")
+        raise HTTPException(status_code=401, detail="Could not validate credentials")
     
 async def create_user(user_create, db: AsyncSession):
     result = await db.execute(select(User).filter(User.id == user_create.id))
@@ -73,7 +64,7 @@ async def verify_password(plain_password: str, hashed_password: str):
 
 async def add_todo_item(todo: TodoListDTO, db: AsyncSession, current_user: User) -> Todo:
     # 현재 로그인한 유저의 ID로 Todo 생성
-    new_todo = Todo(task=todo.task, user_id=current_user.id)
+    new_todo = Todo(task=todo.task, user_id=current_user.numder)
     db.add(new_todo)
     await db.commit()
     await db.refresh(new_todo)

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy import select
 from schemas.schemas import UserCreate, UserOut, LoginDTO, TodoListDTO
 from crud.crud import create_user, get_user_by_id, verify_password, add_todo_item, delete_todo_item, get_all_todos_from_db, verify_token, create_access_token
@@ -32,13 +32,13 @@ async def sign_up(user: UserCreate, db: AsyncSession = Depends(provide_session))
     return new_user
 
 @user_router.post("/users/login")
-async def login_user(form_data: LoginDTO, db: AsyncSession = Depends(provide_session)):
-    db_user = await get_user_by_id(form_data.user_ID, db)
+async def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(provide_session)):
+    db_user = await get_user_by_id(form_data.username, db)
 
     if db_user is None:
         raise HTTPException(status_code=400, detail="User not found.")
 
-    if not await verify_password(form_data.user_PW, db_user.password):
+    if not await verify_password(form_data.password, db_user.password):
         raise HTTPException(status_code=400, detail="Password mismatch.")
 
     # JWT 발급
@@ -51,7 +51,7 @@ async def todolist_add(add: TodoListDTO, db: AsyncSession = Depends(provide_sess
     new_todo = await add_todo_item(add, db, current_user)
     return {"id": new_todo.id, "task": new_todo.task}
 
-
+#로컬스토리지
 @user_router.get("/to_do_list/list", response_model=List[TodoListDTO])
 async def get_all_todos(db: AsyncSession = Depends(provide_session), current_user: User = Depends(get_current_user)):
     try:
