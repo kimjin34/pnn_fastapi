@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy import select
 from schemas.schemas import UserCreate, UserOut, LoginDTO, TodoListDTO
@@ -64,7 +64,7 @@ async def get_all_todos(db: AsyncSession = Depends(provide_session), current_use
 
 
 @user_router.delete("/to_do_list/delete", response_model=TodoListDTO)
-async def todolist_delete(task: int, db: AsyncSession = Depends(provide_session)):
+async def todolist_delete(task: int=Query(...), db: AsyncSession = Depends(provide_session)):
     # delete_todo_item 호출
     deleted_todo = await delete_todo_item(task, db)
     return deleted_todo
