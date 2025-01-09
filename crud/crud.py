@@ -73,7 +73,7 @@ async def add_todo_item(todo: TodoListDTO, db: AsyncSession, current_user: User)
 
 async def get_all_todos_from_db(db: AsyncSession, current_user: User) -> List[Todo]:
     try:
-        query = select(Todo).filter(Todo.user_id == current_user.id)  # 현재 유저의 Todo만 조회
+        query = select(Todo).filter(Todo.user_id == current_user.numder)  # 현재 유저의 Todo만 조회
         result = await db.execute(query)
         todos = result.scalars().all()
         return todos

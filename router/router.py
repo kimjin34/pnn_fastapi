@@ -51,7 +51,7 @@ async def todolist_add(add: TodoListDTO, db: AsyncSession = Depends(provide_sess
     new_todo = await add_todo_item(add, db, current_user)
     return {"id": new_todo.id, "task": new_todo.task}
 
-#로컬스토리지
+
 @user_router.get("/to_do_list/list", response_model=List[TodoListDTO])
 async def get_all_todos(db: AsyncSession = Depends(provide_session), current_user: User = Depends(get_current_user)):
     try:
