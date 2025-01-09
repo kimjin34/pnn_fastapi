@@ -64,7 +64,7 @@ async def get_all_todos(db: AsyncSession = Depends(provide_session), current_use
 
 
 @user_router.delete("/to_do_list/delete", response_model=TodoListDTO)
-async def todolist_delete(todo_id: int, db: AsyncSession = Depends(provide_session)):
+async def todolist_delete(payload: TodoListDTO, db: AsyncSession = Depends(provide_session)):
     # delete_todo_item 호출
-    deleted_todo = await delete_todo_item(todo_id, db)
+    deleted_todo = await delete_todo_item(payload.task, db)
     return deleted_todo
