@@ -27,7 +27,7 @@ async def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
 
 async def add_todo_item(todo: TodoListDTO, db: AsyncSession) -> Todo:
-    new_todo = Todo(task=todo.task, due_date=todo.due_date)
+    new_todo = Todo(task=todo.task)
     
     db.add(new_todo)
     await db.commit() 

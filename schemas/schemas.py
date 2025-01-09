@@ -17,5 +17,5 @@ class LoginDTO(BaseModel):
 
 class TodoListDTO(BaseModel):
     task: str 
-    due_date: datetime 
+    
   

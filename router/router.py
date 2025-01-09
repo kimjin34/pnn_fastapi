@@ -30,4 +30,4 @@ async def login_user(form_data: LoginDTO, db: AsyncSession = Depends(provide_ses
 @user_router.post("/to_do_list/add")
 async def todolist_add(add: TodoListDTO, db: AsyncSession = Depends(provide_session)):
     new_todo = await add_todo_item(add, db)
-    return {"id": new_todo.id, "task": new_todo.task, "due_date": new_todo.due_date}
+    return {"id": new_todo.id, "task": new_todo.task}
