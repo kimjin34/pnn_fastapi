@@ -18,4 +18,4 @@ class Todo(Base):
     
     id = Column(Integer, primary_key=True, index=True)
     task = Column(String, index=True)
-    due_date = Column(DateTime)
+    due_date = Column(DateTime(timezone=True))
