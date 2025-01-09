@@ -15,10 +15,6 @@ async def sign_up(user: UserCreate, db: AsyncSession = Depends(provide_session))
 
     return new_user
 
-
-
-user_router = APIRouter()
-
 @user_router.post("/users/login")
 async def login_user(form_data: LoginDTO, db: AsyncSession = Depends(provide_session)):
     db_user = await get_user_by_id(form_data.user_ID, db)
