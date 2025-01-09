@@ -16,21 +16,21 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def create_access_token(data: Dict[str, str], expires_delta: timedelta = None) -> str:
-    # 기본 만료 시간을 설정
+    
     if expires_delta is None:
         expires_delta = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     
-    # 데이터 복사 및 만료 시간 추가
+    
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + expires_delta  # UTC 기준으로 시간을 계산
+    expire = datetime.now(timezone.utc) + expires_delta  
 
-    # 만약 만료 시간이 과거라면, 예외 처리 추가
+    
     if expire < datetime.now(timezone.utc):
         raise ValueError("Expiration time cannot be in the past.")
 
     to_encode.update({"exp": expire})
     
-    # JWT 인코딩
+    
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
@@ -63,7 +63,7 @@ async def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
 
 async def add_todo_item(todo: TodoListDTO, db: AsyncSession, current_user: User) -> Todo:
-    # 현재 로그인한 유저의 ID로 Todo 생성
+    
     new_todo = Todo(task=todo.task, user_id=current_user.numder)
     db.add(new_todo)
     await db.commit()
@@ -73,7 +73,7 @@ async def add_todo_item(todo: TodoListDTO, db: AsyncSession, current_user: User)
 
 async def get_all_todos_from_db(db: AsyncSession, current_user: User) -> List[Todo]:
     try:
-        query = select(Todo).filter(Todo.user_id == current_user.numder)  # 현재 유저의 Todo만 조회
+        query = select(Todo).filter(Todo.user_id == current_user.numder)  
         result = await db.execute(query)
         todos = result.scalars().all()
         return todos
@@ -81,21 +81,20 @@ async def get_all_todos_from_db(db: AsyncSession, current_user: User) -> List[To
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
 async def delete_todo_item(todo_id: int, db: AsyncSession):
-    # Todo 항목 찾기
+    
     query = select(Todo).filter(Todo.id == todo_id)
     result = await db.execute(query)
     del_todo = result.scalar_one_or_none()
-
-    # Todo가 존재하지 않으면 404 오류 발생
+ 
     if del_todo is None:
         raise HTTPException(status_code=404, detail="Todo not found")
 
     try:
-        # Todo 삭제 (관련된 TodoItem도 자동 삭제됨)
+       
         await db.delete(del_todo)
-        await db.commit()  # 삭제된 내용 커밋
+        await db.commit()  
         
-        return del_todo  # 삭제된 Todo 객체 반환
+        return del_todo 
     except SQLAlchemyError as e:
-        await db.rollback()  # 예외 발생 시 롤백
+        await db.rollback() 
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")

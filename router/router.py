@@ -16,10 +16,8 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
     user_id = payload.get("sub")  # 사용자 ID 추출
     user = await db.execute(select(User).filter(User.id == user_id))  # 사용자 조회
     user = user.scalars().first()
-
     if user is None:
         raise HTTPException(status_code=401, detail="User not found")
-
     return user
 
 @user_router.post("/users/sign_up", response_model=UserOut)
@@ -52,7 +50,7 @@ async def todolist_add(add: TodoListDTO, db: AsyncSession = Depends(provide_sess
     return {"id": new_todo.id, "task": new_todo.task}
 
 
-@user_router.get("/to_do_list/list", response_model=List[TodoListDTO])
+@user_router.get("/to_do_list/list")
 async def get_all_todos(db: AsyncSession = Depends(provide_session), current_user: User = Depends(get_current_user)):
     try:
         todos = await get_all_todos_from_db(db, current_user)
