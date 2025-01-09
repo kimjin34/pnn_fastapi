@@ -1,14 +1,8 @@
 from fastapi import APIRouter, Depends, Form, HTTPException
-from schemas.schemas import UserCreate, UserOut
-from crud.crud import create_user, get_user_by_id, verify_password
+from schemas.schemas import UserCreate, UserOut, LoginDTO, TodoListDTO
+from crud.crud import create_user, get_user_by_id, verify_password, add_todo_item
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.database import provide_session
-from pydantic import BaseModel
-
-class LoginDTO(BaseModel):
-    user_ID: str
-    user_PW: str
-
 
 user_router = APIRouter()
 
@@ -26,10 +20,7 @@ async def sign_up(user: UserCreate, db: AsyncSession = Depends(provide_session))
 user_router = APIRouter()
 
 @user_router.post("/users/login")
-async def login_user(
-    form_data: LoginDTO,  # DTO를 경로 함수에서 사용
-    db: AsyncSession = Depends(provide_session)
-):
+async def login_user(form_data: LoginDTO, db: AsyncSession = Depends(provide_session)):
     db_user = await get_user_by_id(form_data.user_ID, db)
 
     if db_user is None:
@@ -39,3 +30,8 @@ async def login_user(
         raise HTTPException(status_code=400, detail="Password mismatch.")
 
     return {"message": "Login successful", "user": {"id": db_user.id, "name": db_user.name}}
+
+@user_router.post("/to_do_list/add")
+async def todolist_add(add: TodoListDTO, db: AsyncSession = Depends(provide_session)):
+    new_todo = await add_todo_item(add, db)
+    return {"id": new_todo.id, "task": new_todo.task, "due_date": new_todo.due_date}
