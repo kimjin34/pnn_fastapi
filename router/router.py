@@ -52,10 +52,6 @@ async def get_all_todos(db: AsyncSession = Depends(provide_session)):
 
 @user_router.delete("/to_do_list/delete", response_model=TodoListDTO)
 async def todolist_delete(todo_id: int, db: AsyncSession = Depends(provide_session)):
-    try:
-        deleted_todo = await delete_todo_item(todo_id, db) 
-        return deleted_todo  
-    except HTTPException as e:
-        raise e 
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+    # delete_todo_item 호출
+    deleted_todo = await delete_todo_item(todo_id, db)
+    return deleted_todo

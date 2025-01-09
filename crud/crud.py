@@ -50,22 +50,15 @@ async def get_all_todos_from_db(db: AsyncSession) -> List[Todo]:
         raise SQLAlchemyError(f"Database error: {str(e)}")
 
 async def delete_todo_item(todo_id: int, db: AsyncSession):
-    # Todo 항목을 찾습니다.
     query = select(Todo).filter(Todo.id == todo_id)
     result = await db.execute(query)
-    del_todo = result.scalar_one_or_none()  # Todo 항목이 없으면 None 반환
+    del_todo = result.scalar_one_or_none()
 
-    # Todo가 존재하지 않으면 예외 발생
     if del_todo is None:
         raise HTTPException(status_code=404, detail="Todo not found")
 
-    # Todo 항목 삭제
-    db.delete(del_todo)
-    await db.commit()
+    # 삭제 처리
+    await db.delete(del_todo)  # 비동기식으로 삭제 처리
+    await db.commit()  # 비동기 커밋
 
-    # 삭제된 Todo를 Pydantic 모델로 변환하여 반환
-    deleted_todo_dto = TodoListDTO(
-        id=del_todo.id, task=del_todo.task
-    )
-    
-    return deleted_todo_dto
+    return del_todo
