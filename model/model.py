@@ -13,6 +13,7 @@ class User(Base):
     
     todos = relationship("Todo", back_populates="owner", cascade="all, delete-orphan")
 
+
 class Todo(Base):
     __tablename__ = 'todos'
     

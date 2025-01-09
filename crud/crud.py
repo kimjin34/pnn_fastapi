@@ -15,6 +15,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 def create_access_token(data: Dict[str, str], expires_delta: timedelta = None) -> str:
     
     if expires_delta is None:
@@ -34,13 +35,15 @@ def create_access_token(data: Dict[str, str], expires_delta: timedelta = None) -
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
+
 def verify_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
     except JWTError:
         raise HTTPException(status_code=401, detail="Could not validate credentials")
-    
+
+ 
 async def create_user(user_create, db: AsyncSession):
     result = await db.execute(select(User).filter(User.id == user_create.id))
     db_user = result.scalars().first()
@@ -55,12 +58,15 @@ async def create_user(user_create, db: AsyncSession):
     await db.refresh(new_user)
     return new_user
 
+
 async def get_user_by_id(user_id: str, db: AsyncSession):
     result = await db.execute(select(User).filter(User.id == user_id))
     return result.scalars().first()
 
+
 async def verify_password(plain_password: str, hashed_password: str):
     return pwd_context.verify(plain_password, hashed_password)
+
 
 async def add_todo_item(todo: TodoListDTO, db: AsyncSession, current_user: User) -> Todo:
     
@@ -71,6 +77,7 @@ async def add_todo_item(todo: TodoListDTO, db: AsyncSession, current_user: User)
     
     return new_todo
 
+
 async def get_all_todos_from_db(db: AsyncSession, current_user: User) -> List[Todo]:
     try:
         query = select(Todo).filter(Todo.user_id == current_user.numder)  
@@ -79,6 +86,7 @@ async def get_all_todos_from_db(db: AsyncSession, current_user: User) -> List[To
         return todos
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
+
 
 async def delete_todo_item(todo_id: int, db: AsyncSession):
     
@@ -89,8 +97,7 @@ async def delete_todo_item(todo_id: int, db: AsyncSession):
     if del_todo is None:
         raise HTTPException(status_code=404, detail="Todo not found")
 
-    try:
-       
+    try:       
         await db.delete(del_todo)
         await db.commit()  
         
