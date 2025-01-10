@@ -17,8 +17,6 @@ class LoginDTO(BaseModel):
 
 class TodoListDTO(BaseModel):
     task: str 
-    description: str = None 
-    completed: bool = False
 
    
   

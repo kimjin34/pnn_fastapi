@@ -99,8 +99,6 @@ async def update_todo_item(todo_id: int, todo_update: TodoListDTO, db: AsyncSess
         raise HTTPException(status_code=403, detail="You do not have permission to modify this todo.")
 
     todo.task = todo_update.task
-    todo.description = todo_update.description
-    todo.completed = todo_update.completed
 
     db.add(todo)
     await db.commit()
