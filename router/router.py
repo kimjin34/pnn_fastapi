@@ -20,7 +20,7 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
         raise HTTPException(status_code=401, detail="User not found")
     return user
 
-@user_router.post("/check_username/")
+@user_router.post("/users/check_username")
 async def check_username(user: UserCreate, db: AsyncSession = Depends(provide_session)):
     async with db.begin():
         result = await db.execute(select(User).filter(User.id == user.id))
