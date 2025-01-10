@@ -20,6 +20,15 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
         raise HTTPException(status_code=401, detail="User not found")
     return user
 
+@user_router.post("/check_username/")
+async def check_username(user: UserCreate, db: AsyncSession = Depends(provide_session)):
+    async with db.begin():
+        result = await db.execute(select(User).filter(User.id == user.id))
+        db_user = result.scalar_one_or_none()
+
+    if db_user:
+        raise HTTPException(status_code=400, detail="Username already exists")
+    return {"message": "Username is available"}
 
 @user_router.post("/users/sign_up", response_model=UserOut)
 async def sign_up(user: UserCreate, db: AsyncSession = Depends(provide_session)):
@@ -29,7 +38,6 @@ async def sign_up(user: UserCreate, db: AsyncSession = Depends(provide_session))
         raise HTTPException(status_code=400, detail="User already exists.")
 
     return new_user
-
 
 @user_router.post("/users/login")
 async def login_user(form_data: OAuth2PasswordRequestForm = Depends(), db: AsyncSession = Depends(provide_session)):
