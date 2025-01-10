@@ -17,7 +17,7 @@ class LoginDTO(BaseModel):
 
 class TodoListDTO(BaseModel):
     task: str 
-    description: str = None  # 설명도 수정할 수 있도록
+    description: str = None 
     completed: bool = False
 
    

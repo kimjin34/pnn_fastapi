@@ -69,12 +69,11 @@ async def get_all_todos(db: AsyncSession = Depends(provide_session), current_use
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
-@user_router.put("/to_do_list/update/{todo_id}")
+@user_router.put("/to_do_list/update")
 async def update_todo(todo_id: int, todo_update: TodoListDTO, db: AsyncSession = Depends(provide_session), current_user: User = Depends(get_current_user)):
-    # 특정 todo 항목을 수정
+    
     updated_todo = await update_todo_item(todo_id, todo_update, db, current_user)
     
-    # 수정된 todo 항목 반환
     return {"updated_todo": updated_todo}
 
 @user_router.delete("/to_do_list/delete", response_model=TodoListDTO)
