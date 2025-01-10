@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from sqlalchemy import select
 from schemas.schemas import UserCreate, UserOut, LoginDTO, TodoListDTO
-from crud.crud import create_user, get_user_by_id, verify_password, add_todo_item, delete_todo_item, get_all_todos_from_db, verify_token, create_access_token
+from crud.crud import create_user, get_user_by_id, verify_password, add_todo_item, delete_todo_item, get_all_todos_from_db, verify_token, create_access_token, update_todo_item
 from sqlalchemy.ext.asyncio import AsyncSession
 from database.database import provide_session
 from model.model import Todo, User
@@ -69,6 +69,13 @@ async def get_all_todos(db: AsyncSession = Depends(provide_session), current_use
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
+@user_router.put("/to_do_list/update/{todo_id}")
+async def update_todo(todo_id: int, todo_update: TodoListDTO, db: AsyncSession = Depends(provide_session), current_user: User = Depends(get_current_user)):
+    # 특정 todo 항목을 수정
+    updated_todo = await update_todo_item(todo_id, todo_update, db, current_user)
+    
+    # 수정된 todo 항목 반환
+    return {"updated_todo": updated_todo}
 
 @user_router.delete("/to_do_list/delete", response_model=TodoListDTO)
 async def todolist_delete(task: int=Query(...), db: AsyncSession = Depends(provide_session)):

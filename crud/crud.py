@@ -87,6 +87,29 @@ async def get_all_todos_from_db(db: AsyncSession, current_user: User) -> List[To
     except SQLAlchemyError as e:
         raise HTTPException(status_code=500, detail=f"An error occurred: {str(e)}")
 
+async def update_todo_item(todo_id: int, todo_update: TodoListDTO, db: AsyncSession, user: User) -> Todo:
+    # todo_id로 해당 Todo 항목을 가져옵니다.
+    todo = await db.execute(select(Todo).filter(Todo.id == todo_id))
+    todo = todo.scalars().first()
+
+    if todo is None:
+        raise HTTPException(status_code=404, detail="Todo not found")
+
+    # 해당 todo가 현재 유저의 것인지 확인
+    if todo.user_id != user.numder:  # 'user_id'가 Todo 모델에서 올바른 관계 필드인지 확인
+        raise HTTPException(status_code=403, detail="You do not have permission to modify this todo.")
+
+    # 수정된 내용 반영
+    todo.task = todo_update.task
+    todo.description = todo_update.description
+    todo.completed = todo_update.completed
+
+    # 변경 사항 커밋
+    db.add(todo)
+    await db.commit()
+    await db.refresh(todo)  # 최신 상태로 새로 갱신된 todo를 리턴
+
+    return todo
 
 async def delete_todo_item(todo_id: int, db: AsyncSession):
     
